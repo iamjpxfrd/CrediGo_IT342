@@ -9,7 +9,6 @@ const AdminSidebar = ({ sidebarOpen = true }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const currentPath = location.pathname.split('/').pop();
 
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
   const handleLogout = () => setShowLogoutModal(true);

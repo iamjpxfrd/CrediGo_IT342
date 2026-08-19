@@ -73,34 +73,6 @@
   }
 }
 
-@layer components {
-  .btn-primary {
-    @apply px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors;
-  }
-
-  .btn-secondary {
-    @apply px-4 py-2 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors;
-  }
-
-  .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors;
-  }
-
-  .card {
-    @apply bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow;
-  }
-
-  .section {
-    @apply py-16;
-  }
-
-  .container {
-    @apply px-4 mx-auto;
-  }
-}
-
-
-
 @layer base {
   * {
     @apply border-border;

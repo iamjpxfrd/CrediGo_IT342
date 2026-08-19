@@ -10,6 +10,7 @@ if (typeof window !== 'undefined' && !window.global) {
 
 // Use the backend URL from config, ensure it doesn't have trailing slash
 const BACKEND_URL = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+const isProduction = import.meta.env.PROD;
 
 // Debug log for WebSocket connection details
 console.log('WebSocket will connect to:', `${BACKEND_URL}/ws`);

@@ -1,29 +1,28 @@
-import { useState } from 'react';
 import { FaBoxOpen, FaChevronRight, FaExchangeAlt, FaIdCard, FaUsers, FaWallet } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  // Sample data - in real app, this would come from an API
-  const [stats, setStats] = useState({
+  // TODO: Sample data - wire this up to a real dashboard-summary API endpoint.
+  const stats = {
     totalUsers: 1250,
     activeUsers: 752,
     totalProducts: 86,
     pendingKyc: 14,
     walletBalance: 125000,
     transactions: 328
-  });
+  };
 
-  const [recentUsers, setRecentUsers] = useState([
+  const recentUsers = [
     { id: 1, name: 'Maria Garcia', email: 'maria@example.com', joinDate: '2023-06-15', avatar: 'https://ui-avatars.com/api/?name=Maria+Garcia&background=eebbc3&color=232946' },
     { id: 2, name: 'James Wilson', email: 'james@example.com', joinDate: '2023-06-14', avatar: 'https://ui-avatars.com/api/?name=James+Wilson&background=232946&color=eebbc3' },
     { id: 3, name: 'Sofia Martinez', email: 'sofia@example.com', joinDate: '2023-06-12', avatar: 'https://ui-avatars.com/api/?name=Sofia+Martinez&background=eebbc3&color=232946' }
-  ]);
+  ];
 
-  const [recentTransactions, setRecentTransactions] = useState([
+  const recentTransactions = [
     { id: 'TX-5123', user: 'James Wilson', type: 'Purchase', amount: 250.00, date: '2023-06-15', status: 'completed' },
     { id: 'TX-5122', user: 'Maria Garcia', type: 'Withdrawal', amount: 100.00, date: '2023-06-14', status: 'pending' },
     { id: 'TX-5121', user: 'Sofia Martinez', type: 'Deposit', amount: 500.00, date: '2023-06-13', status: 'completed' }
-  ]);
+  ];
 
   // Dashboard cards
   const dashboardCards = [

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { FaCheck, FaEye, FaFilter, FaSearch, FaTimes, FaUserCheck, FaUserClock } from 'react-icons/fa';
+import { FaCheck, FaEye, FaFilter, FaSearch, FaTimes, FaTrash, FaUserCheck, FaUserClock } from 'react-icons/fa';
+import ConfirmModal from '../components/ConfirmModal';
 import {
   approveKYCRequest,
   deleteKYCRequest,
@@ -14,6 +15,7 @@ const AdminKYC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewApplication, setViewApplication] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(null); // id of row being acted upon
   const [actionError, setActionError] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -35,11 +37,12 @@ const AdminKYC = () => {
     fetchKYC();
   }, []);
 
-  const handleApprove = async (id) => {
+  const handleApprove = async (id, comment = '') => {
     setActionLoading(id);
     setActionError(null);
+    setShowVerificationModal(false);
     try {
-      await approveKYCRequest(id);
+      await approveKYCRequest(id, comment);
       await fetchKYC();
     } catch (err) {
       setActionError(err.response?.data?.message || err.message || 'Failed to approve KYC');
@@ -48,30 +51,14 @@ const AdminKYC = () => {
     }
   };
 
-  // Merged handleReject function that works with both API and UI updates
   const handleReject = async (id, reason = '') => {
     setActionLoading(id);
     setActionError(null);
     setShowVerificationModal(false);
 
     try {
-      // If reason is provided, handle as local UI update
-      if (reason) {
-        setKycApplications(prevApplications =>
-          prevApplications.map(app =>
-            app.id === id ? {
-              ...app,
-              status: 'rejected',
-              rejectedDate: new Date().toISOString().split('T')[0],
-              rejectionReason: reason
-            } : app
-          )
-        );
-      } else {
-        // Otherwise, call the API
-        await rejectKYCRequest(id);
-        await fetchKYC();
-      }
+      await rejectKYCRequest(id, reason);
+      await fetchKYC();
     } catch (err) {
       setActionError(err.response?.data?.message || err.message || 'Failed to reject KYC');
     } finally {
@@ -82,6 +69,8 @@ const AdminKYC = () => {
   const handleDelete = async (id) => {
     setActionLoading(id);
     setActionError(null);
+    setShowDeleteConfirm(false);
+    setShowVerificationModal(false);
     try {
       await deleteKYCRequest(id);
       await fetchKYC();
@@ -90,15 +79,6 @@ const AdminKYC = () => {
     } finally {
       setActionLoading(null);
     }
-  };
-
-  const handleVerify = (id) => {
-    setKycApplications(prevApplications =>
-      prevApplications.map(app =>
-        app.id === id ? { ...app, status: 'verified', verifiedDate: new Date().toISOString().split('T')[0] } : app
-      )
-    );
-    setShowVerificationModal(false);
   };
 
   const filteredApplications = kycApplications.filter(app => {
@@ -236,12 +216,22 @@ const AdminKYC = () => {
               <h3 className="text-lg font-semibold text-[#232946]">
                 KYC Application - {viewApplication.user.name}
               </h3>
-              <button
-                onClick={() => setShowVerificationModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FaTimes />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={actionLoading === viewApplication.id}
+                  className="text-red-500 hover:text-red-700 disabled:opacity-50"
+                  title="Delete application"
+                >
+                  <FaTrash />
+                </button>
+                <button
+                  onClick={() => setShowVerificationModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <FaTimes />
+                </button>
+              </div>
             </div>
 
             <div className="p-6 space-y-6">
@@ -313,21 +303,28 @@ const AdminKYC = () => {
 
               {/* Actions */}
               {viewApplication.status === 'pending' && (
-                <div className="flex justify-end space-x-4 border-t border-gray-200 pt-4">
-                  <button
-                    onClick={() => handleReject(viewApplication.id, rejectionReason || "Documents don't match application details")}
-                    className="px-4 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors"
-                  >
-                    <FaTimes className="inline mr-2" />
-                    Reject
-                  </button>
-                  <button
-                    onClick={() => handleVerify(viewApplication.id)}
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    <FaCheck className="inline mr-2" />
-                    Approve
-                  </button>
+                <div className="border-t border-gray-200 pt-4">
+                  {actionError && (
+                    <p className="text-sm text-red-600 mb-3">{actionError}</p>
+                  )}
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      onClick={() => handleReject(viewApplication.id, rejectionReason || "Documents don't match application details")}
+                      disabled={actionLoading === viewApplication.id}
+                      className="px-4 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      <FaTimes className="inline mr-2" />
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => handleApprove(viewApplication.id, rejectionReason)}
+                      disabled={actionLoading === viewApplication.id}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
+                    >
+                      <FaCheck className="inline mr-2" />
+                      Approve
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -394,6 +391,16 @@ const AdminKYC = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        title="Delete KYC Application"
+        message={viewApplication ? `Permanently delete the KYC application for ${viewApplication.user.name}? This cannot be undone.` : ''}
+        onConfirm={() => handleDelete(viewApplication.id)}
+        onCancel={() => setShowDeleteConfirm(false)}
+        confirmText="Delete"
+        confirmVariant="destructive"
+      />
     </div>
   );
 };

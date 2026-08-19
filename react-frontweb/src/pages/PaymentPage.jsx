@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from 'react';
-// import { createPaymentIntent } from '../services/api';
+import { createWalletTopUpIntent } from '../services/api';
 
 const PaymentPage = () => {
   const { toast } = useToast();
@@ -21,7 +21,11 @@ const PaymentPage = () => {
 
     try {
       // Amount should be integer (e.g., 100 for PHP 100)
-      const data = await createPaymentIntent(Number(amount));
+      const response = await createWalletTopUpIntent({
+        amount: Number(amount),
+        paymentType: 'gcash',
+      });
+      const data = response.data;
       setPaymentInfo(data);
 
       // Show success toast
@@ -36,7 +40,14 @@ const PaymentPage = () => {
         window.location.href = data.checkout_url;
       }
     } catch (err) {
-      const errorMessage = typeof err === 'string' ? err : JSON.stringify(err);
+      let errorMessage = 'Failed to initiate payment. Please try again.';
+      if (err.response?.data) {
+        errorMessage = typeof err.response.data === 'string'
+          ? err.response.data
+          : err.response.data.message || errorMessage;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
       setError(errorMessage);
 
       // Show error toast

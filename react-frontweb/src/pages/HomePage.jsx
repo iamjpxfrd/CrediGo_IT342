@@ -1,13 +1,12 @@
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import jwtDecode from 'jwt-decode';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function HomePage() {
   const { user, token, walletBalance, walletError } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   // Show welcome toast when user lands on home page
@@ -107,7 +106,7 @@ function HomePage() {
             return decoded.roles === 'ROLE_ADMIN';
           }
         }
-      } catch (e) {
+      } catch {
         return false;
       }
     }
@@ -290,7 +289,7 @@ function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredGames.map((game, index) => (
+            {featuredGames.map((game) => (
               <motion.div
                 key={game.id}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}

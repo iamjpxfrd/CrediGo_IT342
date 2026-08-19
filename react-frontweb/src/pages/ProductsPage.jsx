@@ -111,6 +111,7 @@ function ProductsPage() {
         const response = await getPlatforms();
         setPlatforms(response.data || []);
       } catch (err) {
+        console.error('Error fetching platforms:', err);
         setError("Could not load game list.");
       } finally {
         setLoadingPlatforms(false);
@@ -129,6 +130,7 @@ function ProductsPage() {
         const response = await getAvailableProducts(selectedPlatformId);
         setProducts(response.data || []);
       } catch (err) {
+        console.error('Error fetching products:', err);
         setError("Could not load products. Please try again later.");
         setProducts([]);
       } finally {

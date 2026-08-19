@@ -29,11 +29,6 @@ function Navbar() {
   // Logo link styling
   const logoLinkClass = "flex items-center space-x-2 group";
 
-  // Format wallet balance
-  const formattedBalance = walletBalance !== null
-    ? new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(walletBalance)
-    : '---';
-
   // Enhance logout handling
   const handleLogout = () => {
     console.log('Navbar: Handling logout');

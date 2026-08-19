@@ -10,13 +10,6 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<repositories>
-		<repository>
-			<id>paymongo-repo</id>
-			<url>https://github.com/paymongo/paymongo-java</url>
-		</repository>
-	</repositories>
-
 	<groupId>com.credigo</groupId>
 	<artifactId>credigo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -107,6 +100,8 @@
 			<groupId>com.paymongo</groupId>
 			<artifactId>paymongo-java</artifactId>
 			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/paymongo-java-1.0.0.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -157,6 +152,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
 			<plugin>

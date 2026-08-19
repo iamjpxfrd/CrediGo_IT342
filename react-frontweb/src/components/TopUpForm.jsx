@@ -1,7 +1,7 @@
 // src/components/TopUpForm.jsx
 import { useToast } from '@/hooks/use-toast';
 import React, { useRef, useState } from 'react';
-import { RiArrowGoBackLine } from 'react-icons/ri';
+import { RiArrowGoBackLine, RiCloseLine } from 'react-icons/ri';
 import { checkPaymentStatus, createWalletTopUpIntent } from '../services/api';
 
 // Get base URL for the current environment
@@ -686,14 +686,24 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
           <div className="mt-4 bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-blue-300 text-sm">
             <p className="font-medium mb-2">Payment in process</p>
             <p>You can complete the payment in a new browser window and continue browsing the site. Your wallet will be updated automatically.</p>
-            <button
-              type="button"
-              onClick={moveToBackground}
-              className="mt-2 text-blue-300 hover:text-blue-100 flex items-center text-sm font-medium"
-            >
-              <span>Move payment to background</span>
-              <RiArrowGoBackLine className="ml-1" />
-            </button>
+            <div className="mt-2 flex items-center gap-4">
+              <button
+                type="button"
+                onClick={moveToBackground}
+                className="text-blue-300 hover:text-blue-100 flex items-center text-sm font-medium"
+              >
+                <span>Move payment to background</span>
+                <RiArrowGoBackLine className="ml-1" />
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelPayment}
+                className="text-red-300 hover:text-red-100 flex items-center text-sm font-medium"
+              >
+                <span>Cancel payment</span>
+                <RiCloseLine className="ml-1" />
+              </button>
+            </div>
           </div>
         )}
       </div>

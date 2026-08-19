@@ -36,7 +36,7 @@ function HistoryPage() {
         year: 'numeric', month: 'short', day: 'numeric',
         hour: 'numeric', minute: '2-digit', hour12: true
       });
-    } catch (e) {
+    } catch {
       return 'Invalid Date';
     }
   };

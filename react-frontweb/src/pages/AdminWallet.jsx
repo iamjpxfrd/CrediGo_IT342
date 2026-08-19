@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import TopUpForm from '../components/TopUpForm';
 
 const AdminWallet = () => {
-  const { walletBalance, user } = useAuth();
+  const { walletBalance } = useAuth();
   const [amount, setAmount] = useState('');
   const [topUpSuccess, setTopUpSuccess] = useState(false);
   const [topUpError, setTopUpError] = useState(null);

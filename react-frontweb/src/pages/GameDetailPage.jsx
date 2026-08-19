@@ -132,7 +132,7 @@ const SkeletonCard = () => (
 
 function GameDetailPage() {
   const { gameId } = useParams();
-  const { isAuthenticated, fetchWalletBalance } = useAuth();
+  const { fetchWalletBalance } = useAuth();
 
   const [game, setGame] = useState(null);
   const [products, setProducts] = useState([]);

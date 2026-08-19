@@ -5,7 +5,8 @@ import AdminSidebar from '../components/AdminSidebar';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [notifications, setNotifications] = useState(3); // Example notification count
+  // TODO: Example notification count - wire this up to a real notifications API.
+  const notifications = 3;
 
   return (
     <div className="flex min-h-screen bg-[#f9f9f1]">

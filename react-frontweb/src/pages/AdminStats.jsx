@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FaUsers, FaBoxOpen, FaExchangeAlt } from 'react-icons/fa';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
-// import adminService from '../api/adminService';
-
 import { getAdminDashboardStats } from '../services/api';
 
 const AdminStats = () => {
@@ -19,6 +17,7 @@ const AdminStats = () => {
         setStats(response.data);
         setError(null);
       } catch (err) {
+        console.error('Error fetching admin dashboard stats:', err);
         setError('Failed to load dashboard data');
       } finally {
         setLoading(false);
