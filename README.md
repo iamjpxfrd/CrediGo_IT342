@@ -51,6 +51,24 @@
       <li>Users can search for digital funds by name, or game.</li>
     </ul>
   </li>
+  <li>
+    Secure Login & KYC Verification
+    <ul>
+      <li>Users can sign in with a username/password or Google account, and verify their identity through a KYC submission flow.</li>
+    </ul>
+  </li>
+  <li>
+    Real-Time Notifications
+    <ul>
+      <li>Users get live updates on payments and account activity via WebSocket-based notifications.</li>
+    </ul>
+  </li>
+  <li>
+    Admin Dashboard
+    <ul>
+      <li>Admins can manage users, review KYC requests, monitor transactions and payments, and view platform-wide stats.</li>
+    </ul>
+  </li>
 </ol>
 
 ---
@@ -64,6 +82,8 @@
   <a href="#"><img src="https://img.shields.io/badge/figma-%23F24E1E.svg?style=flat&logo=figma&logoColor=white" alt="Figma" style="width: 60px; height: auto;"/></a>
   <a href="#"><img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" style="width: 90px; height: auto;"/></a>
   <a href="#"><img src="https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB" alt="React" style="width: 60px; height: auto;"/></a>
+  <a href="#"><img src="https://img.shields.io/badge/springboot-%236DB33F.svg?style=flat&logo=spring-boot&logoColor=white" alt="Spring Boot" style="width: 90px; height: auto;"/></a>
+  <a href="#"><img src="https://img.shields.io/badge/java-%23ED8B00.svg?style=flat&logo=openjdk&logoColor=white" alt="Java" style="width: 55px; height: auto;"/></a>
   <a href="#"><img src="https://img.shields.io/badge/postgres-%23316192.svg?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL" style="width: 80px; height: auto;"/></a>
   <a href="#"><img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white" alt="Postman" style="width: 70px; height: auto;"/></a>
   <a href="#"><img src="https://img.shields.io/badge/kotlin-%237F52FF.svg?style=flat&logo=kotlin&logoColor=white" alt="Kotlin" style="width: 60px; height: auto;"/></a>
