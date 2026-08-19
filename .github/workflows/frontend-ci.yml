@@ -1,0 +1,30 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    paths:
+      - "react-frontweb/**"
+  push:
+    branches: [master]
+    paths:
+      - "react-frontweb/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: react-frontweb
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: react-frontweb/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --audit-level=high

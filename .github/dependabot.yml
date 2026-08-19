@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # React frontend
+  - package-ecosystem: "npm"
+    directory: "/react-frontweb"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
+  # Spring Boot backend (Maven)
+  - package-ecosystem: "maven"
+    directory: "/spring-backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      maven-dependencies:
+        patterns:
+          - "*"
+
+  # Spring Boot backend (npm tooling)
+  - package-ecosystem: "npm"
+    directory: "/spring-backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
+  # GitHub Actions workflows themselves
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
