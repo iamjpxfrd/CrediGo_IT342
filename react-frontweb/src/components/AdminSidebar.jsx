@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import ConfirmModal from './ConfirmModal';
 
 const AdminSidebar = ({ sidebarOpen = true }) => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,9 +38,9 @@ const AdminSidebar = ({ sidebarOpen = true }) => {
   ];
 
   const profile = {
-    name: 'Admin User',
+    name: user?.username || 'Admin',
     role: 'Administrator',
-    avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=232946&color=fff',
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.username || 'Admin')}&background=232946&color=fff`,
   };
 
   return (
@@ -112,7 +112,7 @@ const AdminSidebar = ({ sidebarOpen = true }) => {
           {sidebarOpen && <span className="ml-3 font-medium">Logout</span>}
         </button>
         <ConfirmModal
-          isOpen={showLogoutModal}
+          open={showLogoutModal}
           onConfirm={handleLogoutConfirm}
           onCancel={handleLogoutCancel}
           message="Are you sure you want to log out?"

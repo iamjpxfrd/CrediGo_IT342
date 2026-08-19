@@ -100,23 +100,23 @@ export default function PaymentSuccess() {
   }, [location.search, toast]);
 
   return (
-    <div className="max-w-md mx-auto my-12 p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto my-12 p-6 bg-credigo-input-bg/95 backdrop-blur-sm border border-gray-700/50 rounded-lg shadow-lg text-credigo-light">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Status</h1>
+        <h1 className="text-2xl font-bold mb-4">Payment Status</h1>
 
         {loading ? (
           <div className="flex flex-col items-center space-y-4">
-            <Spinner className="h-12 w-12 text-primary" />
-            <p className="text-gray-600">Verifying your payment...</p>
+            <Spinner className="h-12 w-12 text-credigo-accent" />
+            <p className="text-gray-400">Verifying your payment...</p>
           </div>
         ) : error ? (
           <div className="text-center">
-            <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4">
+            <div className="bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-md mb-4">
               <p className="font-semibold">Payment Verification Error</p>
               <p className="text-sm mt-1">{error}</p>
 
               {debugInfo && (
-                <div className="mt-4 p-2 bg-gray-100 rounded text-left text-xs">
+                <div className="mt-4 p-2 bg-credigo-dark border border-gray-700 text-gray-400 rounded text-left text-xs">
                   <div><strong>Environment:</strong> {debugInfo.environment}</div>
                   <div><strong>Current URL:</strong> {debugInfo.currentUrl}</div>
                   <div><strong>Expected URL:</strong> {debugInfo.expectedUrl}</div>
@@ -124,13 +124,13 @@ export default function PaymentSuccess() {
                 </div>
               )}
             </div>
-            <Button onClick={() => navigate('/home')} className="mt-4">
+            <Button onClick={() => navigate('/home')} className="mt-4 bg-gradient-to-r from-credigo-accent to-purple-500 text-credigo-dark font-bold hover:shadow-lg hover:shadow-purple-500/20">
               Return
             </Button>
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-green-100 text-green-800 p-4 rounded-md">
+            <div className="bg-green-500/20 border border-green-700 text-green-300 p-4 rounded-md">
               {paymentResult?.walletCredited ? (
                 <>
                   <h2 className="text-xl font-bold">Payment Successful!</h2>
@@ -145,30 +145,30 @@ export default function PaymentSuccess() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between py-2 border-b border-gray-700">
                 <span className="font-medium">Status:</span>
                 <span className="capitalize">{paymentResult?.status || 'Processing'}</span>
               </div>
               {paymentResult?.amount && (
-                <div className="flex justify-between py-2 border-b">
+                <div className="flex justify-between py-2 border-b border-gray-700">
                   <span className="font-medium">Amount:</span>
                   <span>₱{(paymentResult.amount / 100).toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between py-2 border-b border-gray-700">
                 <span className="font-medium">Payment Method:</span>
                 <span>{localStorage.getItem('current_payment_method') || 'GCash'}</span>
               </div>
             </div>
 
             <div className="pt-4">
-              <Button onClick={() => navigate('/home')} className="w-full">
+              <Button onClick={() => navigate('/home')} className="w-full bg-gradient-to-r from-credigo-accent to-purple-500 text-credigo-dark font-bold hover:shadow-lg hover:shadow-purple-500/20">
                 Return
               </Button>
             </div>
 
             {import.meta.env.DEV && (
-              <div className="mt-4 text-xs text-left text-gray-500 p-2 bg-gray-100 rounded">
+              <div className="mt-4 text-xs text-left text-gray-400 p-2 bg-credigo-dark border border-gray-700 rounded">
                 <details>
                   <summary>Debug Info</summary>
                   <div className="mt-2 space-y-1">

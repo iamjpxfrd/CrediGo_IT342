@@ -63,10 +63,10 @@ const PaymentPage = () => {
 
   return (
     <div className="max-w-md mx-auto my-8 px-4">
-      <Card>
+      <Card className="bg-credigo-input-bg/95 backdrop-blur-sm border-gray-700/50 text-credigo-light">
         <CardHeader>
           <CardTitle>Make a Payment</CardTitle>
-          <CardDescription>Enter the amount to pay</CardDescription>
+          <CardDescription className="text-gray-400">Enter the amount to pay</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -84,12 +84,13 @@ const PaymentPage = () => {
                   onChange={e => setAmount(e.target.value)}
                   required
                   min="1"
+                  className="bg-credigo-dark border-gray-700 text-credigo-light placeholder-gray-400 focus-visible:ring-credigo-accent"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-gradient-to-r from-credigo-accent to-purple-500 text-credigo-dark font-bold hover:shadow-lg hover:shadow-purple-500/20"
                 disabled={loading || !amount}
               >
                 {loading ? 'Processing...' : 'Pay Now'}
@@ -98,16 +99,16 @@ const PaymentPage = () => {
           </form>
 
           {paymentInfo && (
-            <div className="mt-6 p-3 bg-slate-50 rounded-md">
+            <div className="mt-6 p-3 bg-credigo-dark border border-gray-700 rounded-md">
               <h3 className="font-medium mb-2">Payment Created!</h3>
-              <pre className="text-xs bg-slate-100 p-2 rounded overflow-auto">
+              <pre className="text-xs bg-black/30 text-gray-300 p-2 rounded overflow-auto">
                 {JSON.stringify(paymentInfo, null, 2)}
               </pre>
             </div>
           )}
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+            <div className="mt-4 p-3 bg-red-900/50 text-red-300 rounded-md text-sm">
               {error}
             </div>
           )}

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import credigoLogo from '../assets/images/credigo_icon.svg';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../utils/auth';
 
 const OAuth2RedirectHandler = () => {
   const navigate = useNavigate();
@@ -41,9 +42,10 @@ const OAuth2RedirectHandler = () => {
         // Fetch wallet balance if needed
         await fetchWalletBalance();
 
-        // Redirect to home page
+        // Redirect admins to the dashboard, everyone else home
+        const destination = isAdmin(token) ? '/admin/dashboard' : '/home';
         setTimeout(() => {
-          navigate('/home');
+          navigate(destination);
         }, 1500);
       } catch (err) {
         console.error('OAuth redirect error:', err);

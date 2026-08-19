@@ -200,18 +200,18 @@ function ProductsPage() {
 
   return (
     <div className="font-sans text-credigo-light p-4 md:p-6">
-      <h1 className="text-3xl text-credigo-dark font-bold mb-6 text-center md:text-left">Browse Top-ups</h1>
+      <h1 className="text-3xl text-credigo-light font-bold mb-6 text-center md:text-left">Browse Top-ups</h1>
 
       {/* Display Purchase Status Message */}
       {purchaseStatusMessage && (
-        <div className={`p-3 mb-4 text-sm rounded-lg border ${purchaseStatusMessage.startsWith('Successfully') ? 'bg-green-500/20 border-green-700 text-credigo-dark' : 'bg-red-900/50 border-red-700 text-red-400'}`} role="alert">
+        <div className={`p-3 mb-4 text-sm rounded-lg border ${purchaseStatusMessage.startsWith('Successfully') ? 'bg-green-500/20 border-green-700 text-green-300' : 'bg-red-900/50 border-red-700 text-red-400'}`} role="alert">
           {purchaseStatusMessage}
         </div>
       )}
 
       {/* Platform Filters */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3 text-credigo-dark/80">Filter by Game:</h2>
+        <h2 className="text-lg font-semibold mb-3 text-credigo-light/80">Filter by Game:</h2>
         {loadingPlatforms ? (
           <p className="text-gray-400">Loading games...</p>
         ) : (

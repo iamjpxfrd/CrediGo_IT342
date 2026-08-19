@@ -9,7 +9,7 @@ function ProtectedLayout() {
 
   return (
     // Use flex column and min-h-screen to help push footer down
-    <div className="flex flex-col min-h-screen bg-gray-100 font-sans"> {/* Background for content area */}
+    <div className="flex flex-col min-h-screen bg-credigo-dark font-sans">
 
       {/* *** Use the Navbar component *** */}
       <Navbar />

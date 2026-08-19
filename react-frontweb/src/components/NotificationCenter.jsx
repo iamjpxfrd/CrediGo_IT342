@@ -28,19 +28,22 @@ const NotificationCenter = () => {
     };
 
     useEffect(() => {
-        if (user?.id) {
-            websocketService.connect(user.id, (notification) => {
-                setNotifications(prev => [{
-                    ...notification,
-                    id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-                    timestamp: notification.timestamp || new Date().toISOString(),
-                    read: false
-                }, ...prev.slice(0, 49)]); // Keep only the 50 most recent notifications
-            });
-        }
+        if (!user?.id) return;
+
+        // The connection itself is owned by App.jsx (tied to auth state); this
+        // just plugs a rendering callback into the already-running connection,
+        // so mounting/unmounting this component doesn't affect the connection.
+        websocketService.setNotificationCallback((notification) => {
+            setNotifications(prev => [{
+                ...notification,
+                id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                timestamp: notification.timestamp || new Date().toISOString(),
+                read: false
+            }, ...prev.slice(0, 49)]); // Keep only the 50 most recent notifications
+        });
 
         return () => {
-            websocketService.disconnect();
+            websocketService.setNotificationCallback(null);
         };
     }, [user?.id]);
 
@@ -147,7 +150,7 @@ const NotificationCenter = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 md:w-96 bg-gray-900 rounded-lg shadow-xl overflow-hidden z-50 border border-gray-800/50"
+                        className="absolute right-0 mt-2 w-80 md:w-96 bg-credigo-input-bg rounded-lg shadow-xl overflow-hidden z-50 border border-gray-800/50"
                     >
                         <div className="px-4 py-3 border-b border-gray-800/50 flex justify-between items-center bg-gradient-to-r from-gray-900 to-indigo-950/70">
                             <div className="flex items-center space-x-3">
@@ -169,7 +172,7 @@ const NotificationCenter = () => {
                             )}
                         </div>
 
-                        <div className="max-h-96 overflow-y-auto bg-gray-900">
+                        <div className="max-h-96 overflow-y-auto bg-credigo-input-bg">
                             {notifications.length === 0 ? (
                                 <div className="p-8 text-center text-gray-400">
                                     <div className="bg-indigo-900/30 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">

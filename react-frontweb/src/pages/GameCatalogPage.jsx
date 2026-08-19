@@ -7,7 +7,7 @@ const GameCard = ({ game }) => {
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all duration-200"
+      className="bg-credigo-input-bg border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all duration-200"
     >
       <Link to={`/games/${game.id}`} className="block h-full">
         <div className="relative h-48">
@@ -49,7 +49,7 @@ const GameCard = ({ game }) => {
 };
 
 const SkeletonGameCard = () => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden animate-pulse">
+  <div className="bg-credigo-input-bg/50 border border-gray-800 rounded-xl overflow-hidden animate-pulse">
     <div className="h-48 bg-gray-800"></div>
     <div className="p-4">
       <div className="h-5 bg-gray-800 rounded w-3/4 mb-2"></div>

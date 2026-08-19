@@ -128,6 +128,19 @@ public class TransactionServiceImpl implements TransactionService {
     return transactionResponses;
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public List<TransactionResponse> getAllTransactions() {
+    log.debug("Fetching transactions across all users (admin)");
+
+    List<Transaction> transactions = transactionRepository
+        .findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "transactionTimestamp"));
+
+    return transactions.stream()
+        .map(this::mapToResponseDto)
+        .collect(Collectors.toList());
+  }
+
   // --- Mock External API Call (Keep as is) ---
   private boolean callExternalTopUpAPI(Transaction transaction) {
     log.warn("SIMULATING external API call for transaction ID: {}", transaction.getId());

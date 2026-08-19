@@ -18,7 +18,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -99,6 +101,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authz -> authz
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/oauth2/**").permitAll()
+            .requestMatchers("/ws/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/platforms", "/api/platforms/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products/{productId}/reviews").permitAll()
@@ -107,6 +110,14 @@ public class SecurityConfig {
             .anyRequest().authenticated())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // Without this, an unauthenticated request to any /api/** endpoint (e.g. an
+        // expired JWT) falls through to oauth2Login's default entry point, which
+        // silently redirects the browser through Google's OAuth screen instead of
+        // returning a 401. API clients always want a clean 401 here.
+        .exceptionHandling(exceptions -> exceptions
+            .defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                request -> request.getServletPath().startsWith("/api/")))
         .oauth2Login(oauth2 -> oauth2
             .authorizationEndpoint(authorization -> authorization
                 .baseUri("/api/auth/oauth2/authorize"))

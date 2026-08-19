@@ -2,6 +2,7 @@
 import { useToast } from '@/hooks/use-toast';
 import React, { useRef, useState } from 'react';
 import { RiArrowGoBackLine, RiCloseLine } from 'react-icons/ri';
+import { useAuth } from '../context/AuthContext';
 import { checkPaymentStatus, createWalletTopUpIntent } from '../services/api';
 
 // Get base URL for the current environment
@@ -9,11 +10,16 @@ const BASE_URL = import.meta.env.DEV
   ? 'http://localhost:5173'
   : 'https://credi-go-it-342.vercel.app';
 
+// Groups raw digits into "1234 5678 9012 3456" for display only.
+// The underlying state (and what gets submitted) stays digits-only.
+const formatCardNumber = (digits) => digits.replace(/(.{4})/g, '$1 ').trim();
+
 /**
  * Form component for PayMongo wallet top-up payment.
  */
 function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
@@ -33,6 +39,30 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
   });
 
   const [mobileNumber, setMobileNumber] = useState('');
+
+  // Reformats the card number as-you-type while keeping the cursor in the
+  // right spot relative to the digits (not the spaces just inserted).
+  const handleCardNumberChange = (e) => {
+    const input = e.target;
+    const digitsBeforeCursor = input.value.slice(0, input.selectionStart).replace(/\D/g, '').length;
+    const digits = input.value.replace(/\D/g, '').slice(0, 16);
+
+    setCardDetails((prev) => ({ ...prev, cardNumber: digits }));
+
+    const formatted = formatCardNumber(digits);
+    requestAnimationFrame(() => {
+      let cursorPos = digitsBeforeCursor === 0 ? 0 : formatted.length;
+      let seen = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (formatted[i] !== ' ') seen++;
+        if (seen === digitsBeforeCursor && digitsBeforeCursor !== 0) {
+          cursorPos = i + 1;
+          break;
+        }
+      }
+      input.setSelectionRange(cursorPos, cursorPos);
+    });
+  };
 
   // Supported PayMongo payment methods
   const paymentMethods = [
@@ -250,7 +280,7 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
           amount: response.data.amount,
           created: Date.now(),
           status: response.data.status || 'awaiting_payment_method',
-          username: localStorage.getItem('username') || 'Anonymous User',
+          username: user?.username || 'Anonymous User',
           paymentType: selectedMethod,
           trackingInBackground: false
         }));
@@ -477,11 +507,13 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
               <label htmlFor="cardNumber" className="block text-sm text-credigo-light mb-1">Card Number</label>
               <input
                 type="text"
+                inputMode="numeric"
+                autoComplete="cc-number"
                 id="cardNumber"
                 placeholder="1234 5678 9012 3456"
-                value={cardDetails.cardNumber}
-                onChange={(e) => setCardDetails({...cardDetails, cardNumber: e.target.value.replace(/\D/g, '')})}
-                maxLength={16}
+                value={formatCardNumber(cardDetails.cardNumber)}
+                onChange={handleCardNumberChange}
+                maxLength={19}
                 className="w-full bg-credigo-dark border-gray-600 rounded-md p-2 text-credigo-light placeholder-gray-400"
                 required
               />

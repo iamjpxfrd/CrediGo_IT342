@@ -1,28 +1,61 @@
+import { useEffect, useState } from 'react';
 import { FaBoxOpen, FaChevronRight, FaExchangeAlt, FaIdCard, FaUsers, FaWallet } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAdminDashboardStats } from '../services/api';
+import { getAllUsers } from '../services/adminUsers';
+import { getKYCRequests } from '../services/api';
 
 const AdminDashboard = () => {
-  // TODO: Sample data - wire this up to a real dashboard-summary API endpoint.
-  const stats = {
-    totalUsers: 1250,
-    activeUsers: 752,
-    totalProducts: 86,
-    pendingKyc: 14,
-    walletBalance: 125000,
-    transactions: 328
-  };
+  const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [walletTotal, setWalletTotal] = useState(0);
+  const [pendingKyc, setPendingKyc] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const recentUsers = [
-    { id: 1, name: 'Maria Garcia', email: 'maria@example.com', joinDate: '2023-06-15', avatar: 'https://ui-avatars.com/api/?name=Maria+Garcia&background=eebbc3&color=232946' },
-    { id: 2, name: 'James Wilson', email: 'james@example.com', joinDate: '2023-06-14', avatar: 'https://ui-avatars.com/api/?name=James+Wilson&background=232946&color=eebbc3' },
-    { id: 3, name: 'Sofia Martinez', email: 'sofia@example.com', joinDate: '2023-06-12', avatar: 'https://ui-avatars.com/api/?name=Sofia+Martinez&background=eebbc3&color=232946' }
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [statsRes, usersRes] = await Promise.all([
+          getAdminDashboardStats(),
+          getAllUsers(),
+        ]);
 
-  const recentTransactions = [
-    { id: 'TX-5123', user: 'James Wilson', type: 'Purchase', amount: 250.00, date: '2023-06-15', status: 'completed' },
-    { id: 'TX-5122', user: 'Maria Garcia', type: 'Withdrawal', amount: 100.00, date: '2023-06-14', status: 'pending' },
-    { id: 'TX-5121', user: 'Sofia Martinez', type: 'Deposit', amount: 500.00, date: '2023-06-13', status: 'completed' }
-  ];
+        setStats(statsRes.data);
+
+        const users = usersRes.data || [];
+        setWalletTotal(users.reduce((sum, u) => sum + (Number(u.balance) || 0), 0));
+        setRecentUsers(
+          [...users]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3)
+        );
+
+        try {
+          const kycRes = await getKYCRequests();
+          setPendingKyc((kycRes.data || []).filter((k) => k.status === 'pending').length);
+        } catch (kycErr) {
+          console.error('Error fetching KYC requests:', kycErr);
+        }
+      } catch (err) {
+        console.error('Error fetching admin dashboard data:', err);
+        setError('Failed to load dashboard data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64 text-gray-500">Loading dashboard...</div>;
+  }
+  if (error) {
+    return <div className="bg-red-100 text-red-700 p-4 rounded-lg">{error}</div>;
+  }
 
   // Dashboard cards
   const dashboardCards = [
@@ -49,21 +82,21 @@ const AdminDashboard = () => {
     },
     {
       title: 'Pending KYC',
-      value: stats.pendingKyc,
+      value: pendingKyc,
       icon: <FaIdCard size={24} />,
       color: 'from-yellow-500 to-yellow-600',
       link: '/admin/kyc'
     },
     {
       title: 'Wallet Balance',
-      value: `₱${stats.walletBalance.toLocaleString()}`,
+      value: `₱${walletTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: <FaWallet size={24} />,
       color: 'from-[#eebbc3] to-pink-500',
       link: '/admin/wallet'
     },
     {
       title: 'Transactions',
-      value: stats.transactions,
+      value: stats.totalTransactions,
       icon: <FaExchangeAlt size={24} />,
       color: 'from-[#6285cf] to-indigo-600',
       link: '/admin/transactions'
@@ -133,20 +166,30 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="p-6">
+            {recentUsers.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-4">No users yet</p>
+            ) : (
             <div className="space-y-4">
               {recentUsers.map((user) => (
                 <div key={user.id} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=eebbc3&color=232946`}
+                      alt={user.username}
+                      className="w-10 h-10 rounded-full"
+                    />
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-[#232946]">{user.name}</p>
+                      <p className="text-sm font-medium text-[#232946]">{user.username}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">Joined {user.joinDate}</div>
+                  <div className="text-xs text-gray-500">
+                    Joined {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                  </div>
                 </div>
               ))}
             </div>
+            )}
           </div>
         </div>
 
@@ -171,16 +214,20 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {recentTransactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{tx.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{tx.user}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">₱{tx.amount.toFixed(2)}</td>
+                {stats.recentTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500">No transactions yet</td>
+                  </tr>
+                ) : stats.recentTransactions.map((tx) => (
+                  <tr key={tx.transactionId} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">#{tx.transactionId}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{tx.username}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">₱{tx.totalAmount.toFixed(2)}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        tx.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {tx.status === 'completed' ? 'Completed' : 'Pending'}
+                        {tx.status === 'COMPLETED' ? 'Completed' : tx.status}
                       </span>
                     </td>
                   </tr>
@@ -199,7 +246,10 @@ const AdminDashboard = () => {
             <p className="text-[#232946] opacity-80">Thank you for choosing CrediGo for your financial needs!</p>
           </div>
           <div>
-            <button className="px-4 py-2 bg-[#232946] text-white rounded-lg shadow hover:bg-[#1a2035] transition-colors">
+            <button
+              onClick={() => navigate('/about')}
+              className="px-4 py-2 bg-[#232946] text-white rounded-lg shadow hover:bg-[#1a2035] transition-colors"
+            >
               Learn About Us
             </button>
           </div>

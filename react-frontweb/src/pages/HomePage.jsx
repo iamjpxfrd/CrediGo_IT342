@@ -1,21 +1,51 @@
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import jwtDecode from 'jwt-decode';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getTransactionHistory, getWishlist } from '../services/api';
+import { formatCurrency } from '../utils/formatters';
 
 function HomePage() {
   const { user, token, walletBalance, walletError } = useAuth();
   const { toast } = useToast();
 
-  // Show welcome toast when user lands on home page
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [transactionCount, setTransactionCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  // Show a one-time welcome toast right after login, not on every visit to this page
   useEffect(() => {
+    if (sessionStorage.getItem('welcomeToastShown')) return;
+    sessionStorage.setItem('welcomeToastShown', 'true');
     toast({
       title: `Welcome back, ${user?.username || 'User'}!`,
       description: "You've successfully logged in to CrediGo.",
     });
   }, [toast, user?.username]);
+
+  // Load real transaction and wishlist counts for the stats cards
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await getTransactionHistory();
+        const transactions = response.data || [];
+        setTransactionCount(transactions.length);
+        setRecentTransactions(transactions.slice(0, 3));
+      } catch (err) {
+        console.error('Error fetching transaction history:', err);
+      }
+
+      try {
+        const response = await getWishlist();
+        setWishlistCount((response.data || []).length);
+      } catch (err) {
+        console.error('Error fetching wishlist:', err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   // Featured games data
   const featuredGames = [
@@ -78,22 +108,6 @@ function HomePage() {
       excerpt: 'Watch the top teams compete for the grand prize'
     }
   ];
-
-  // Recent transactions - for user stats
-  const recentTransactions = [
-    { id: 1, type: 'purchase', game: 'PUBG Mobile', amount: 120.50, date: '2023-06-15', status: 'completed', points: '600 UC' },
-    { id: 2, type: 'topup', amount: 500, date: '2023-06-10', status: 'completed', description: 'Wallet Deposit' },
-    { id: 3, type: 'purchase', game: 'Valorant', amount: 65.25, date: '2023-06-05', status: 'pending', points: '1050 VP' },
-  ];
-
-  // User account stats
-  const userStats = {
-    balance: walletBalance !== null ? walletBalance : 0,
-    pendingTransactions: 3,
-    wishlistItems: 5,
-    lastLogin: '2 hours ago',
-    creditScore: 785
-  };
 
   const hasAdminRole = () => {
     if (token) {
@@ -192,14 +206,14 @@ function HomePage() {
 
         {/* User Stats Cards (darker colors) */}
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           <motion.div
             variants={itemVariants}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-blue-400/30 hover:shadow-md hover:shadow-blue-900/20 transition-all"
+            className="bg-credigo-input-bg border border-gray-800 rounded-xl p-4 hover:border-blue-400/30 hover:shadow-md hover:shadow-blue-900/20 transition-all"
           >
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm font-medium text-gray-400">Balance</p>
@@ -209,7 +223,7 @@ function HomePage() {
                 </svg>
               </div>
             </div>
-            <p className="text-xl font-bold text-white">${userStats.balance.toFixed(2)}</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(walletBalance !== null ? walletBalance : 0)}</p>
             <Link to="/wallet" className="text-xs text-blue-300 hover:text-blue-200 mt-2 inline-block group">
               Add funds <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
             </Link>
@@ -217,7 +231,7 @@ function HomePage() {
 
           <motion.div
             variants={itemVariants}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-green-400/30 hover:shadow-md hover:shadow-green-900/20 transition-all"
+            className="bg-credigo-input-bg border border-gray-800 rounded-xl p-4 hover:border-green-400/30 hover:shadow-md hover:shadow-green-900/20 transition-all"
           >
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm font-medium text-gray-400">Transactions</p>
@@ -227,7 +241,7 @@ function HomePage() {
                 </svg>
               </div>
             </div>
-            <p className="text-xl font-bold text-white">{userStats.pendingTransactions}</p>
+            <p className="text-xl font-bold text-white">{transactionCount}</p>
             <Link to="/history" className="text-xs text-green-300 hover:text-green-200 mt-2 inline-block group">
               View history <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
             </Link>
@@ -235,7 +249,7 @@ function HomePage() {
 
           <motion.div
             variants={itemVariants}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-purple-400/30 hover:shadow-md hover:shadow-purple-900/20 transition-all"
+            className="bg-credigo-input-bg border border-gray-800 rounded-xl p-4 hover:border-purple-400/30 hover:shadow-md hover:shadow-purple-900/20 transition-all"
           >
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm font-medium text-gray-400">Wishlist</p>
@@ -245,32 +259,10 @@ function HomePage() {
                 </svg>
               </div>
             </div>
-            <p className="text-xl font-bold text-white">{userStats.wishlistItems}</p>
+            <p className="text-xl font-bold text-white">{wishlistCount}</p>
             <Link to="/wishlist" className="text-xs text-purple-300 hover:text-purple-200 mt-2 inline-block group">
               View wishlist <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
             </Link>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-amber-400/30 hover:shadow-md hover:shadow-amber-900/20 transition-all"
-          >
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-sm font-medium text-gray-400">Last Login</p>
-              <div className="h-8 w-8 rounded-full bg-amber-900/30 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xl font-bold text-white">{userStats.lastLogin}</p>
-            <span className="text-xs text-amber-300 mt-2 inline-block flex items-center">
-              Active now
-              <span className="relative ml-1 h-2 w-2">
-                <span className="absolute animate-ping h-2 w-2 rounded-full bg-amber-400 opacity-75"></span>
-                <span className="absolute h-2 w-2 rounded-full bg-amber-300"></span>
-              </span>
-            </span>
           </motion.div>
         </motion.div>
 
@@ -293,7 +285,7 @@ function HomePage() {
               <motion.div
                 key={game.id}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all"
+                className="bg-credigo-input-bg border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all"
               >
                 <div className="relative h-48">
                   <img src={game.image} alt={game.title} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" />
@@ -357,7 +349,7 @@ function HomePage() {
                 <motion.div
                   key={game.id}
                   whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-                  className="relative bg-gray-900 border border-gray-800 rounded-lg overflow-hidden group hover:shadow-md hover:shadow-gray-900/40 transition-all"
+                  className="relative bg-credigo-input-bg border border-gray-800 rounded-lg overflow-hidden group hover:shadow-md hover:shadow-gray-900/40 transition-all"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10 opacity-60 group-hover:opacity-50 transition-opacity"></div>
                   <img src={game.image} alt={game.title} className="w-full h-28 object-cover" />
@@ -415,7 +407,7 @@ function HomePage() {
                 <motion.div
                   key={news.id}
                   whileHover={{ x: 5, transition: { duration: 0.2 } }}
-                  className="bg-gray-900 border border-gray-800 rounded-lg p-3 flex gap-3 items-center hover:shadow-md hover:shadow-gray-900/30 transition-all"
+                  className="bg-credigo-input-bg border border-gray-800 rounded-lg p-3 flex gap-3 items-center hover:shadow-md hover:shadow-gray-900/30 transition-all"
                 >
                   <img src={news.image} alt={news.title} className="w-20 h-20 rounded-md object-cover flex-shrink-0" />
                   <div>
@@ -451,7 +443,10 @@ function HomePage() {
             </Link>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-md">
+          <div className="bg-credigo-input-bg border border-gray-800 rounded-xl overflow-hidden shadow-md">
+            {recentTransactions.length === 0 ? (
+              <p className="text-center text-gray-500 py-10">You have no transactions yet.</p>
+            ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead>
@@ -464,29 +459,25 @@ function HomePage() {
                 </thead>
                 <tbody className="divide-y divide-gray-800">
                   {recentTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-800/30 transition-colors">
+                    <tr key={transaction.transactionId} className="hover:bg-gray-800/30 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-white">{transaction.game || transaction.description}</div>
-                        <div className="text-xs text-gray-400">
-                          {transaction.type === 'purchase' ? 'Purchase' : 'Top Up'}
-                          {transaction.points && ` · ${transaction.points}`}
-                        </div>
+                        <div className="text-sm font-medium text-white">{transaction.productName || 'Wallet Top Up'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`text-sm font-medium ${transaction.type === 'purchase' ? 'text-rose-300' : 'text-emerald-300'}`}>
-                          {transaction.type === 'purchase' ? '-' : '+'} ${transaction.amount.toFixed(2)}
+                        <div className="text-sm font-medium text-emerald-300">
+                          {formatCurrency(transaction.totalAmount)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                        {new Date(transaction.date).toLocaleDateString()}
+                        {transaction.transactionTimestamp ? new Date(transaction.transactionTimestamp).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${
-                          transaction.status === 'completed'
+                          transaction.status === 'COMPLETED'
                             ? 'bg-emerald-900/30 text-emerald-300'
                             : 'bg-amber-900/30 text-amber-300'
                         }`}>
-                          {transaction.status}
+                          {transaction.status ? transaction.status.replace('_', ' ') : 'UNKNOWN'}
                         </span>
                       </td>
                     </tr>
@@ -494,6 +485,7 @@ function HomePage() {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </motion.section>
 

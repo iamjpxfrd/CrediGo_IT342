@@ -12,7 +12,7 @@ const GamePointCard = ({ product, onBuyClick, isInWishlist, onWishlistChange }) 
   return (
     <motion.div
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all"
+      className="bg-credigo-input-bg border border-gray-800 rounded-xl overflow-hidden hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-900/20 transition-all"
     >
       <div className="relative">
         {product.imageUrl ? (
@@ -108,7 +108,7 @@ const GamePointCard = ({ product, onBuyClick, isInWishlist, onWishlistChange }) 
 
 // Skeleton loader for game point cards
 const SkeletonCard = () => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden animate-pulse">
+  <div className="bg-credigo-input-bg/50 border border-gray-800 rounded-xl overflow-hidden animate-pulse">
     <div className="h-40 bg-gray-800"></div>
     <div className="p-4">
       <div className="h-5 bg-gray-800 rounded w-3/4 mb-2"></div>
@@ -385,7 +385,7 @@ function GameDetailPage() {
 
         {/* Products grid */}
         {processedProducts.length === 0 ? (
-          <div className="bg-gray-900/30 border border-gray-800 rounded-lg p-8 text-center">
+          <div className="bg-credigo-input-bg/30 border border-gray-800 rounded-lg p-8 text-center">
             <h3 className="text-xl font-semibold text-gray-300 mb-2">No Products Available</h3>
             <p className="text-gray-400 mb-4">There are currently no items available for this game.</p>
             <Link

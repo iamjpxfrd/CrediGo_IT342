@@ -1,7 +1,7 @@
 // src/App.jsx
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense, lazy, useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { API_BASE_URL } from './config/api.config';
 import { useAuth } from './context/AuthContext';
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -55,9 +55,14 @@ const Loading = () => (
 function App() {
   const { isAuthenticated, token, user } = useAuth();
   const adminOnly = isAuthenticated && isAdmin(token);
-  const location = useLocation();
 
-  // Handle WebSocket connections based on authentication state
+  // Handle WebSocket connections based on authentication state. This is the
+  // sole owner of the connection's lifecycle - components that want to react
+  // to incoming notifications (e.g. NotificationCenter) register a callback
+  // via websocketService.setNotificationCallback() instead of calling
+  // connect()/disconnect() themselves, so mounting/unmounting them doesn't
+  // tear down the shared connection. location.pathname is deliberately not a
+  // dependency here - route navigation shouldn't reconnect the socket.
   useEffect(() => {
     if (isAuthenticated && user?.id) {
       websocketService.connect(user.id, null);
@@ -68,7 +73,7 @@ function App() {
     return () => {
       websocketService.disconnect();
     };
-  }, [isAuthenticated, user?.id, location.pathname]);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     // Test backend connectivity when app loads
@@ -98,9 +103,9 @@ function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
         {/* Public Routes */}
-        <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to="/home" replace />} />
-        <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/home" replace />} />
-        <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/home" replace />} />
+        <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to={adminOnly ? "/admin/dashboard" : "/home"} replace />} />
+        <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to={adminOnly ? "/admin/dashboard" : "/home"} replace />} />
+        <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to={adminOnly ? "/admin/dashboard" : "/home"} replace />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/pay" element={<PaymentPage />} />
         <Route path="/not-authorized" element={<NotAuthorized />} />

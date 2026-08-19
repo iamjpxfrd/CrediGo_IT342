@@ -37,7 +37,7 @@ const AdminWallet = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-gray-900 rounded-lg shadow">
+    <div className="max-w-lg mx-auto p-6 bg-credigo-input-bg border border-gray-700 rounded-lg shadow text-credigo-light">
       <h2 className="text-2xl font-bold mb-4">Wallet Top-up (User Demo)</h2>
       <p className="mb-2 text-gray-400">This form uses the PayMongo/TopUpForm logic for all users. No admin privileges required.</p>
       <div className="mb-4">
@@ -52,7 +52,7 @@ const AdminWallet = () => {
           value={amount}
           onChange={e => setAmount(e.target.value)}
           placeholder="Enter amount (e.g. 100)"
-          className="p-2 rounded border border-gray-600 bg-gray-800 text-white w-full"
+          className="p-2 rounded border border-gray-700 bg-credigo-dark text-credigo-light placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-credigo-accent"
         />
       </div>
       <TopUpForm

@@ -5,6 +5,8 @@ import com.credigo.backend.dto.PaymentResponse;
 import com.credigo.backend.dto.PaymentStatusResponse;
 import org.springframework.beans.factory.annotation.Value;
 import com.credigo.backend.dto.WalletTopUpRequest;
+import com.credigo.backend.repository.UserRepository;
+import com.credigo.backend.service.NotificationService;
 import com.credigo.backend.service.PaymentService;
 import com.credigo.backend.service.WalletService;
 
@@ -48,13 +50,17 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PaymentController(WalletService walletService, PaymentService paymentService, ObjectMapper objectMapper, WebClient webClient) {
+    public PaymentController(WalletService walletService, PaymentService paymentService, ObjectMapper objectMapper, WebClient webClient, NotificationService notificationService, UserRepository userRepository) {
         this.walletService = walletService;
         this.paymentService = paymentService;
         this.objectMapper = objectMapper;
         this.webClient = webClient;
+        this.notificationService = notificationService;
+        this.userRepository = userRepository;
         log.info("PayMongo Webhook Secret Key Loaded: {}", paymongoWebhookSecretKey != null && !paymongoWebhookSecretKey.isEmpty() ? "Yes" : "No");
     }
 
@@ -627,12 +633,28 @@ public class PaymentController {
 
             // Add funds to the targetUsername's wallet, not the admin's
             walletService.addFundsToWallet(targetUsername, amount, uniqueTestPaymentId);
+
+            userRepository.findByUsername(targetUsername).ifPresent(u ->
+                notificationService.sendSuccessNotification(
+                    u.getId().toString(),
+                    "Your payment of ₱" + amount + " has been confirmed by an admin and added to your wallet."
+                )
+            );
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Payment confirmed and " + amount + " PHP added to " + targetUsername + "'s wallet.");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error confirming payment: ", e);
+
+            userRepository.findByUsername(targetUsername).ifPresent(u ->
+                notificationService.sendErrorNotification(
+                    u.getId().toString(),
+                    "Your pending payment (" + paymentIntentId + ") could not be confirmed: " + e.getMessage()
+                )
+            );
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Could not confirm payment: " + e.getMessage());
         }

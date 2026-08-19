@@ -14,7 +14,7 @@ function WalletPage() {
 
   return (
     <div className="font-sans p-4 md:p-6 text-credigo-light">
-      <h1 className="text-3xl text-credigo-dark font-bold mb-6">My Wallet</h1>
+      <h1 className="text-3xl text-credigo-light font-bold mb-6">My Wallet</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {/* Balance Display Card */}

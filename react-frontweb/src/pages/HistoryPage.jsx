@@ -62,7 +62,7 @@ function HistoryPage() {
 
   return (
     <div className="font-sans text-credigo-light p-4 md:p-6">
-      <h1 className="text-3xl font-bold mb-6 text-credigo-dark">Transaction History</h1>
+      <h1 className="text-3xl font-bold mb-6 text-credigo-light">Transaction History</h1>
 
       {/* Loading State */}
       {loading && (
