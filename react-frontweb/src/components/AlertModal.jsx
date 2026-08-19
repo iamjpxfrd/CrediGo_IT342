@@ -10,19 +10,19 @@ import {
 
 const AlertModal = ({ open, title, message, onClose, type = 'info' }) => {
   // Color by type
-  const color = type === 'error' ? 'text-red-600' : type === 'success' ? 'text-green-600' : 'text-slate-900';
+  const color = type === 'error' ? 'text-red-400' : type === 'success' ? 'text-green-400' : 'text-credigo-accent';
 
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-credigo-input-bg/95 backdrop-blur-sm border border-gray-700/50 text-credigo-light">
         <AlertDialogHeader>
           <AlertDialogTitle className={color}>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{message}</AlertDialogDescription>
+          <AlertDialogDescription className="text-gray-300">{message}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction
             onClick={onClose}
-            className="bg-slate-800 hover:bg-slate-700"
+            className="bg-credigo-accent text-credigo-dark font-semibold hover:bg-credigo-accent/90"
           >
             OK
           </AlertDialogAction>

@@ -150,8 +150,9 @@ public class UserServiceImpl implements UserService, UserDetailsService { // Imp
 
   // List all users
   @Override
+  @Transactional(readOnly = true)
   public java.util.List<User> findAllUsers() {
-    return userRepository.findAll();
+    return userRepository.findAllWithRolesAndWallet();
   }
 
   // Create user (admin)

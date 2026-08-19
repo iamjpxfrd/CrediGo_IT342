@@ -191,7 +191,7 @@ const AdminPayments = () => {
       if (error.response) {
         // If it's a backend error with data
         if (error.response.data && typeof error.response.data === 'string' && error.response.data.includes('Wallet not found')) {
-          errorMessage = `User "${targetUsername || 'Anonymous User'}" doesn't have a wallet. Please use an existing username.`;
+          errorMessage = `User "${targetUsername || 'testuser'}" doesn't have a wallet. Please use an existing username.`;
         } else if (error.response.data && error.response.data.message) {
           errorMessage = error.response.data.message;
         } else {
@@ -309,15 +309,15 @@ const AdminPayments = () => {
   return (
     <div className="container mx-auto px-4">
       {/* Real-time Pending Payments Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Pending Payments</h2>
+          <h2 className="text-2xl font-bold text-[#232946]">Pending Payments</h2>
           <Button
             onClick={fetchPendingPayments}
             disabled={loadingPending}
             variant="outline"
             size="sm"
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 border-gray-300 text-[#232946] hover:bg-[#f9f9f1] hover:text-[#232946]"
           >
             <RiRefreshLine className={`${loadingPending ? 'animate-spin' : ''}`} />
             Refresh
@@ -365,6 +365,7 @@ const AdminPayments = () => {
                         onClick={() => handleQuickConfirm(payment)}
                         variant="default"
                         size="sm"
+                        className="bg-[#eebbc3] text-[#232946] hover:bg-opacity-90"
                       >
                         Load Details
                       </Button>
@@ -379,8 +380,8 @@ const AdminPayments = () => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Manual Payment Confirmation */}
-        <div className="md:w-1/2 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Manual Confirmation</h2>
+        <div className="md:w-1/2 bg-white rounded-xl shadow-md border border-gray-100 p-6">
+          <h2 className="text-2xl font-bold text-[#232946] mb-6">Manual Confirmation</h2>
           <p className="mb-4 text-sm text-gray-600">
             Use this form to manually confirm payments for demonstration purposes.
             This will credit the user's wallet without requiring actual payment processing.
@@ -405,7 +406,7 @@ const AdminPayments = () => {
                 value={paymentIntentId}
                 onChange={(e) => setPaymentIntentId(e.target.value)}
                 placeholder="pi_xxxxxxxxxxxxxxxx"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#eebbc3] focus:border-[#eebbc3]"
                 required
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -424,7 +425,7 @@ const AdminPayments = () => {
                 min="1"
                 step="0.01"
                 placeholder="100.00"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#eebbc3] focus:border-[#eebbc3]"
                 required
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -444,7 +445,7 @@ const AdminPayments = () => {
                   setValidationError(null); // Clear validation error when input changes
                 }}
                 placeholder="Enter a valid username"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#eebbc3] focus:border-[#eebbc3]"
               />
               <p className="mt-1 text-xs text-gray-500">
                 Enter a valid username that exists in the system. For testing, try: {userList.join(', ')}
@@ -456,7 +457,7 @@ const AdminPayments = () => {
                 type="submit"
                 disabled={processing}
                 variant="default"
-                className="flex-1"
+                className="flex-1 bg-[#eebbc3] text-[#232946] hover:bg-opacity-90"
               >
                 {processing ? 'Processing...' : 'Confirm Payment'}
               </Button>
@@ -487,8 +488,8 @@ const AdminPayments = () => {
         </div>
 
         {/* Payment History */}
-        <div className="md:w-1/2 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Confirmation History</h2>
+        <div className="md:w-1/2 bg-white rounded-xl shadow-md border border-gray-100 p-6">
+          <h2 className="text-2xl font-bold text-[#232946] mb-6">Confirmation History</h2>
 
           {paymentHistory.length === 0 ? (
             <p className="text-gray-500 text-center py-8">No payment confirmations yet</p>

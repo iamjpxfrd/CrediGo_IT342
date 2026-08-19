@@ -32,4 +32,11 @@ public interface TransactionService {
    */
   List<TransactionResponse> getTransactionHistory(String username); // Add this method
 
+  /**
+   * Retrieves transactions across all users, most recent first. Admin use only.
+   *
+   * @return A list of TransactionResponse DTOs, ordered by most recent first.
+   */
+  List<TransactionResponse> getAllTransactions();
+
 }

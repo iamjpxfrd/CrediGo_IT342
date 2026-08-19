@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { FaUsers, FaBoxOpen, FaExchangeAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
-// import adminService from '../api/adminService';
-
 import { getAdminDashboardStats } from '../services/api';
+
+const STATUS_COLORS = {
+  COMPLETED: '#16a34a',
+  PENDING: '#ca8a04',
+  PROCESSING: '#7c3aed',
+  FAILED: '#dc2626',
+  REFUNDED: '#2563eb',
+};
+
+const STATUS_LABELS = {
+  COMPLETED: 'Completed',
+  PENDING: 'Pending',
+  PROCESSING: 'Processing',
+  FAILED: 'Failed',
+  REFUNDED: 'Refunded',
+};
 
 const AdminStats = () => {
   const [stats, setStats] = useState(null);
@@ -19,6 +35,7 @@ const AdminStats = () => {
         setStats(response.data);
         setError(null);
       } catch (err) {
+        console.error('Error fetching admin dashboard stats:', err);
         setError('Failed to load dashboard data');
       } finally {
         setLoading(false);
@@ -68,12 +85,40 @@ const AdminStats = () => {
         />
       </div>
 
-      {/* Chart placeholder */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* Transaction status breakdown */}
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-[#232946] mb-4">Transaction Overview</h2>
-        <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
-          <p className="text-gray-500">Chart would render here (using Recharts, Chart.js, etc.)</p>
-        </div>
+        {Object.keys(stats.transactionsByStatus || {}).length === 0 ? (
+          <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
+            No transactions yet
+          </div>
+        ) : (
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={Object.entries(stats.transactionsByStatus).map(([status, count]) => ({
+                  status,
+                  label: STATUS_LABELS[status] || status,
+                  count,
+                }))}
+                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={{ stroke: '#e5e7eb' }} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  cursor={{ fill: '#f9f9f1' }}
+                  contentStyle={{ borderRadius: 8, borderColor: '#e5e7eb', fontSize: 13 }}
+                />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]} maxBarSize={56}>
+                  {Object.keys(stats.transactionsByStatus).map((status) => (
+                    <Cell key={status} fill={STATUS_COLORS[status] || '#9ca3af'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Recent Transactions */}
@@ -93,12 +138,16 @@ const AdminStats = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {stats.recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{transaction.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.user}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱{transaction.amount.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
+              {stats.recentTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">No transactions yet</td>
+                </tr>
+              ) : stats.recentTransactions.map((transaction) => (
+                <tr key={transaction.transactionId} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{transaction.transactionId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.username}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱{transaction.totalAmount.toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(transaction.transactionTimestamp).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge status={transaction.status} />
                   </td>
@@ -108,7 +157,7 @@ const AdminStats = () => {
           </table>
         </div>
         <div className="px-6 py-4 border-t border-gray-200">
-          <button className="text-[#6285cf] hover:text-[#445ab1] font-medium">View All Transactions</button>
+          <Link to="/admin/transactions" className="text-[#6285cf] hover:text-[#445ab1] font-medium">View All Transactions</Link>
         </div>
       </div>
     </div>

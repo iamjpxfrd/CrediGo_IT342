@@ -10,6 +10,7 @@ if (typeof window !== 'undefined' && !window.global) {
 
 // Use the backend URL from config, ensure it doesn't have trailing slash
 const BACKEND_URL = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+const isProduction = import.meta.env.PROD;
 
 // Debug log for WebSocket connection details
 console.log('WebSocket will connect to:', `${BACKEND_URL}/ws`);
@@ -29,15 +30,24 @@ class WebSocketService {
             return;
         }
 
-        this.notificationCallback = onNotification;
+        // Only replace the callback if one was actually passed, so a caller
+        // that just wants the connection open (e.g. App.jsx's connect(id, null))
+        // can't clobber a callback a component registered via
+        // setNotificationCallback().
+        if (onNotification) {
+            this.notificationCallback = onNotification;
+        }
         this.connectionAttempts = 0;
 
         try {
             // Log the connection attempt
             console.log(`Attempting to connect to WebSocket at ${BACKEND_URL}/ws for user ${userId}`);
 
+            const authToken = localStorage.getItem('authToken');
+
             this.client = new Client({
                 webSocketFactory: () => new SockJS(`${BACKEND_URL}/ws`),
+                connectHeaders: authToken ? { Authorization: `Bearer ${authToken}` } : {},
                 onConnect: () => {
                     this.connected = true;
                     this.connectionAttempts = 0;
@@ -112,6 +122,11 @@ class WebSocketService {
                     this.connectionAttempts++;
                     if (this.connectionAttempts < this.maxReconnectAttempts) {
                         console.log(`Attempting to reconnect (${this.connectionAttempts}/${this.maxReconnectAttempts})...`);
+                    } else {
+                        // stompjs's own reconnectDelay retries forever regardless of this
+                        // counter - stop it explicitly once we've given up.
+                        console.warn('Max WebSocket reconnect attempts reached, giving up.');
+                        this.client.deactivate();
                     }
                 },
                 reconnectDelay: 5000,
@@ -130,12 +145,22 @@ class WebSocketService {
         }
     }
 
+    // Lets a UI component (e.g. NotificationCenter) start/stop reacting to
+    // incoming notifications without owning the connection itself - the
+    // connection's lifecycle belongs solely to whoever calls connect()/
+    // disconnect() based on auth state (see App.jsx). Pass null to stop
+    // reacting without tearing down the shared connection.
+    setNotificationCallback(callback) {
+        this.notificationCallback = callback;
+    }
+
     disconnect() {
         if (this.client) {
             try {
-                if (this.connected) {
-                    this.client.deactivate();
-                }
+                // deactivate() unconditionally - a client stuck retrying a failed
+                // connection has this.connected === false forever, and skipping
+                // deactivate() in that case left the reconnect loop unkillable.
+                this.client.deactivate();
             } catch (error) {
                 console.error('Error disconnecting WebSocket:', error);
             } finally {

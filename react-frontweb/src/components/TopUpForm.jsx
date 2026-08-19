@@ -1,7 +1,8 @@
 // src/components/TopUpForm.jsx
 import { useToast } from '@/hooks/use-toast';
 import React, { useRef, useState } from 'react';
-import { RiArrowGoBackLine } from 'react-icons/ri';
+import { RiArrowGoBackLine, RiCloseLine } from 'react-icons/ri';
+import { useAuth } from '../context/AuthContext';
 import { checkPaymentStatus, createWalletTopUpIntent } from '../services/api';
 
 // Get base URL for the current environment
@@ -9,11 +10,16 @@ const BASE_URL = import.meta.env.DEV
   ? 'http://localhost:5173'
   : 'https://credi-go-it-342.vercel.app';
 
+// Groups raw digits into "1234 5678 9012 3456" for display only.
+// The underlying state (and what gets submitted) stays digits-only.
+const formatCardNumber = (digits) => digits.replace(/(.{4})/g, '$1 ').trim();
+
 /**
  * Form component for PayMongo wallet top-up payment.
  */
 function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
@@ -33,6 +39,30 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
   });
 
   const [mobileNumber, setMobileNumber] = useState('');
+
+  // Reformats the card number as-you-type while keeping the cursor in the
+  // right spot relative to the digits (not the spaces just inserted).
+  const handleCardNumberChange = (e) => {
+    const input = e.target;
+    const digitsBeforeCursor = input.value.slice(0, input.selectionStart).replace(/\D/g, '').length;
+    const digits = input.value.replace(/\D/g, '').slice(0, 16);
+
+    setCardDetails((prev) => ({ ...prev, cardNumber: digits }));
+
+    const formatted = formatCardNumber(digits);
+    requestAnimationFrame(() => {
+      let cursorPos = digitsBeforeCursor === 0 ? 0 : formatted.length;
+      let seen = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (formatted[i] !== ' ') seen++;
+        if (seen === digitsBeforeCursor && digitsBeforeCursor !== 0) {
+          cursorPos = i + 1;
+          break;
+        }
+      }
+      input.setSelectionRange(cursorPos, cursorPos);
+    });
+  };
 
   // Supported PayMongo payment methods
   const paymentMethods = [
@@ -250,7 +280,7 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
           amount: response.data.amount,
           created: Date.now(),
           status: response.data.status || 'awaiting_payment_method',
-          username: localStorage.getItem('username') || 'Anonymous User',
+          username: user?.username || 'Anonymous User',
           paymentType: selectedMethod,
           trackingInBackground: false
         }));
@@ -477,11 +507,13 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
               <label htmlFor="cardNumber" className="block text-sm text-credigo-light mb-1">Card Number</label>
               <input
                 type="text"
+                inputMode="numeric"
+                autoComplete="cc-number"
                 id="cardNumber"
                 placeholder="1234 5678 9012 3456"
-                value={cardDetails.cardNumber}
-                onChange={(e) => setCardDetails({...cardDetails, cardNumber: e.target.value.replace(/\D/g, '')})}
-                maxLength={16}
+                value={formatCardNumber(cardDetails.cardNumber)}
+                onChange={handleCardNumberChange}
+                maxLength={19}
                 className="w-full bg-credigo-dark border-gray-600 rounded-md p-2 text-credigo-light placeholder-gray-400"
                 required
               />
@@ -686,14 +718,24 @@ function TopUpForm({ onPaymentSuccess, onPaymentCancel, onPaymentError }) {
           <div className="mt-4 bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-blue-300 text-sm">
             <p className="font-medium mb-2">Payment in process</p>
             <p>You can complete the payment in a new browser window and continue browsing the site. Your wallet will be updated automatically.</p>
-            <button
-              type="button"
-              onClick={moveToBackground}
-              className="mt-2 text-blue-300 hover:text-blue-100 flex items-center text-sm font-medium"
-            >
-              <span>Move payment to background</span>
-              <RiArrowGoBackLine className="ml-1" />
-            </button>
+            <div className="mt-2 flex items-center gap-4">
+              <button
+                type="button"
+                onClick={moveToBackground}
+                className="text-blue-300 hover:text-blue-100 flex items-center text-sm font-medium"
+              >
+                <span>Move payment to background</span>
+                <RiArrowGoBackLine className="ml-1" />
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelPayment}
+                className="text-red-300 hover:text-red-100 flex items-center text-sm font-medium"
+              >
+                <span>Cancel payment</span>
+                <RiCloseLine className="ml-1" />
+              </button>
+            </div>
           </div>
         )}
       </div>

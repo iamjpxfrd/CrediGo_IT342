@@ -1,4 +1,3 @@
-import React, { useSate } from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import NotFoundImg from '../assets/images/404image.svg';

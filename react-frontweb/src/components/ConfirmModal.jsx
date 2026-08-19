@@ -1,6 +1,6 @@
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 
-const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
+const ConfirmModal = ({ open, title, message, onConfirm, onCancel, confirmText = "Confirm", confirmVariant = "default" }) => {
   return (
     <ConfirmDialog
       open={open}
@@ -8,8 +8,9 @@ const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
       title={title}
       description={message}
       onConfirm={onConfirm}
-      confirmText="Confirm"
+      confirmText={confirmText}
       cancelText="Cancel"
+      confirmVariant={confirmVariant}
     />
   );
 };

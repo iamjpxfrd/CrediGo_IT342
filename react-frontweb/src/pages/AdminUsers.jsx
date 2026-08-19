@@ -89,29 +89,29 @@ const AdminUsers = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
+      <h2 className="text-2xl font-bold mb-4 text-[#232946]">User Management</h2>
       <button
-        className="mb-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        className="mb-4 bg-[#eebbc3] text-[#232946] font-medium px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors"
         onClick={handleAddUser}
       >
         + Add User
       </button>
       {showForm && (
-        <div className="mb-6 p-4 bg-gray-100 border rounded-lg max-w-md">
+        <div className="mb-6 p-4 bg-[#f9f9f1] border border-gray-200 rounded-xl max-w-md">
           <form onSubmit={handleFormSubmit}>
             <div className="mb-2">
-              <label className="block text-sm font-semibold">Username</label>
+              <label className="block text-sm font-semibold text-[#232946]">Username</label>
               <input
-                className="w-full p-2 rounded border"
+                className="w-full p-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#eebbc3]"
                 value={formState.username}
                 onChange={e => setFormState(f => ({ ...f, username: e.target.value }))}
                 required
               />
             </div>
             <div className="mb-2">
-              <label className="block text-sm font-semibold">Email</label>
+              <label className="block text-sm font-semibold text-[#232946]">Email</label>
               <input
-                className="w-full p-2 rounded border"
+                className="w-full p-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#eebbc3]"
                 value={formState.email}
                 onChange={e => setFormState(f => ({ ...f, email: e.target.value }))}
                 required
@@ -119,9 +119,9 @@ const AdminUsers = () => {
               />
             </div>
             <div className="mb-2">
-              <label className="block text-sm font-semibold">Active Status</label>
+              <label className="block text-sm font-semibold text-[#232946]">Active Status</label>
               <select
-                className="w-full p-2 rounded border"
+                className="w-full p-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#eebbc3]"
                 value={formState.active}
                 onChange={e => setFormState(f => ({ ...f, active: e.target.value === 'true' }))}
               >
@@ -130,9 +130,9 @@ const AdminUsers = () => {
               </select>
             </div>
             <div className="mb-2">
-              <label className="block text-sm font-semibold">Balance (₱)</label>
+              <label className="block text-sm font-semibold text-[#232946]">Balance (₱)</label>
               <input
-                className="w-full p-2 rounded border"
+                className="w-full p-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#eebbc3]"
                 value={formState.balance}
                 onChange={e => setFormState(f => ({ ...f, balance: Number(e.target.value) }))}
                 type="number"
@@ -141,10 +141,10 @@ const AdminUsers = () => {
               />
             </div>
             <div className="flex gap-2 mt-4">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              <button type="submit" className="bg-[#eebbc3] text-[#232946] font-medium px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors">
                 {editingUser ? 'Update' : 'Create'}
               </button>
-              <button type="button" className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setShowForm(false)}>
+              <button type="button" className="bg-gray-200 text-[#232946] px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors" onClick={() => setShowForm(false)}>
                 Cancel
               </button>
             </div>
@@ -152,43 +152,43 @@ const AdminUsers = () => {
         </div>
       )}
       {loading ? (
-        <p>Loading users...</p>
+        <p className="text-gray-500">Loading users...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-100">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="py-2 px-4 border-b">ID</th>
-                <th className="py-2 px-4 border-b">Username</th>
-                <th className="py-2 px-4 border-b">Email</th>
-                <th className="py-2 px-4 border-b">Status</th>
-                <th className="py-2 px-4 border-b">Balance (₱)</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">ID</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">Username</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">Email</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">Status</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">Balance (₱)</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className={user.active ? '' : 'bg-red-50'}>
-                  <td className="py-2 px-4 border-b">{user.id}</td>
-                  <td className="py-2 px-4 border-b">{user.username}</td>
-                  <td className="py-2 px-4 border-b">{user.email}</td>
-                  <td className="py-2 px-4 border-b">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${user.active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                <tr key={user.id} className={`hover:bg-gray-50 ${user.active ? '' : 'bg-red-50'}`}>
+                  <td className="py-3 px-4 border-b border-gray-100 text-gray-700">{user.id}</td>
+                  <td className="py-3 px-4 border-b border-gray-100 text-[#232946] font-medium">{user.username}</td>
+                  <td className="py-3 px-4 border-b border-gray-100 text-gray-600">{user.email}</td>
+                  <td className="py-3 px-4 border-b border-gray-100">
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {user.active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="py-2 px-4 border-b text-right">₱{!isNaN(Number(user.balance)) ? Number(user.balance).toFixed(2) : '0.00'}</td>
-                  <td className="py-2 px-4 border-b flex gap-1">
+                  <td className="py-3 px-4 border-b border-gray-100 text-right text-gray-700">₱{!isNaN(Number(user.balance)) ? Number(user.balance).toFixed(2) : '0.00'}</td>
+                  <td className="py-3 px-4 border-b border-gray-100 flex gap-1">
                     <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-700"
+                      className="bg-[#eebbc3] text-[#232946] px-2 py-1 rounded text-xs font-medium hover:bg-opacity-90 transition-colors"
                       onClick={() => handleEdit(user)}
                     >
                       Edit
                     </button>
                     <button
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
                       onClick={() => handleDelete(user.id)}
                       disabled={actionLoading[user.id]}
                     >

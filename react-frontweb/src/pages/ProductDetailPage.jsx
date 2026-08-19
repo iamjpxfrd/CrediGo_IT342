@@ -203,7 +203,7 @@ function ProductDetailPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-credigo-accent"></div>
       </div>
     );
   }
@@ -211,7 +211,7 @@ function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded relative" role="alert">
           <strong className="font-bold">Error: </strong>
           <span className="block sm:inline">{error || 'Product not found'}</span>
           <button
@@ -226,13 +226,13 @@ function ProductDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 text-credigo-light">
       {/* Status Message */}
       {purchaseStatusMessage && (
         <div className={`mb-6 p-3 rounded-lg border ${
           purchaseStatusMessage.startsWith('Successfully')
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : 'bg-red-50 border-red-200 text-red-700'
+            ? 'bg-green-500/20 border-green-700 text-green-300'
+            : 'bg-red-900/50 border-red-700 text-red-300'
         }`} role="alert">
           {purchaseStatusMessage}
         </div>
@@ -253,7 +253,7 @@ function ProductDetailPage() {
         {/* Product Info */}
         <div className="w-full md:w-1/2">
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
+            <h1 className="text-3xl font-bold text-credigo-light mb-2">{product.name}</h1>
             {wishlistCheckComplete && (
               <WishlistButton
                 productId={product.id}
@@ -264,7 +264,7 @@ function ProductDetailPage() {
             )}
           </div>
 
-          <div className="bg-gray-100 inline-block px-3 py-1 rounded-full text-sm font-medium mb-4">
+          <div className="bg-credigo-input-bg border border-gray-700 text-gray-300 inline-block px-3 py-1 rounded-full text-sm font-medium mb-4">
             {product.platformName || 'Unknown Platform'}
           </div>
 
@@ -273,23 +273,23 @@ function ProductDetailPage() {
             <div className="flex mr-2">
               {renderStarRating(calculateAverageRating())}
             </div>
-            <span className="text-gray-600">
+            <span className="text-gray-400">
               {calculateAverageRating()} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
             </span>
           </div>
 
-          <div className="text-2xl font-bold text-primary mb-4">
+          <div className="text-2xl font-bold text-credigo-accent mb-4">
             {formatCurrency(product.price)}
           </div>
 
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2">Description</h2>
-            <p className="text-gray-600">{product.description || 'No description available.'}</p>
+            <p className="text-gray-400">{product.description || 'No description available.'}</p>
           </div>
 
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2">Details</h2>
-            <ul className="list-disc pl-5 space-y-1 text-gray-600">
+            <ul className="list-disc pl-5 space-y-1 text-gray-400">
               <li>Platform: {product.platformName || 'N/A'}</li>
               <li>Availability: {product.available ? 'In Stock' : 'Out of Stock'}</li>
               <li>Product ID: {product.id}</li>
@@ -301,8 +301,8 @@ function ProductDetailPage() {
             disabled={!product.available}
             className={`w-full py-3 rounded-lg text-center font-semibold transition-colors ${
               product.available
-                ? 'bg-primary text-white hover:bg-primary-dark'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? 'bg-credigo-button text-credigo-dark hover:bg-opacity-90'
+                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
             }`}
           >
             {product.available ? 'Purchase Now' : 'Currently Unavailable'}
@@ -316,23 +316,23 @@ function ProductDetailPage() {
 
         {/* Write Review Form */}
         {isAuthenticated && !hasUserReviewed && (
-          <div className="bg-gray-50 p-6 rounded-lg mb-8">
+          <div className="bg-credigo-input-bg border border-gray-700 p-6 rounded-lg mb-8">
             <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
             {reviewError && (
-              <div className="mb-4 text-red-600">{reviewError}</div>
+              <div className="mb-4 text-red-400">{reviewError}</div>
             )}
             <form onSubmit={handleReviewSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Your Rating</label>
+                <label className="block text-gray-300 mb-2">Your Rating</label>
                 {renderRatingInput()}
               </div>
               <div className="mb-4">
-                <label htmlFor="comment" className="block text-gray-700 mb-2">Your Review</label>
+                <label htmlFor="comment" className="block text-gray-300 mb-2">Your Review</label>
                 <textarea
                   id="comment"
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-2 bg-credigo-dark border border-gray-700 text-credigo-light placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-credigo-accent"
                   rows={4}
                   placeholder="Share your experience with this product..."
                 ></textarea>
@@ -340,7 +340,7 @@ function ProductDetailPage() {
               <button
                 type="submit"
                 disabled={submittingReview}
-                className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark disabled:opacity-50"
+                className="bg-credigo-button text-credigo-dark py-2 px-4 rounded-md hover:bg-opacity-90 disabled:opacity-50"
               >
                 {submittingReview ? 'Submitting...' : 'Submit Review'}
               </button>
@@ -351,12 +351,12 @@ function ProductDetailPage() {
         {/* Review List */}
         {loadingReviews ? (
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-credigo-accent mx-auto"></div>
           </div>
         ) : reviews.length > 0 ? (
           <div className="space-y-6">
             {reviews.map((review) => (
-              <div key={`${review.userId}-${review.createdAt}`} className="border-b border-gray-200 pb-4">
+              <div key={`${review.userId}-${review.createdAt}`} className="border-b border-gray-700 pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="mr-3">{renderStarRating(review.rating)}</div>
@@ -366,12 +366,12 @@ function ProductDetailPage() {
                     {new Date(review.reviewTimestamp || review.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="mt-2 text-gray-700">{review.comment}</p>
+                <p className="mt-2 text-gray-300">{review.comment}</p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 py-4">No reviews yet. Be the first to review this product!</p>
+          <p className="text-gray-400 py-4">No reviews yet. Be the first to review this product!</p>
         )}
       </div>
 

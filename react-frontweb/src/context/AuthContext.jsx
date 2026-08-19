@@ -164,6 +164,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('token'); // In case this is also used
     localStorage.removeItem('user');  // In case this is also used
+    sessionStorage.removeItem('welcomeToastShown');
 
     // Clear auth state
     setUser(null);
@@ -199,7 +200,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {!loading ? children : (
-        <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+        <div className="flex justify-center items-center h-screen bg-credigo-input-bg text-white">
           Loading...
         </div>
       )}

@@ -7,6 +7,7 @@ import credigoLogo from '../assets/images/credigo_icon.svg';
 import AlertModal from '../components/AlertModal';
 import { API_BASE_URL } from '../config/api.config';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../utils/auth';
 
 // Google Icon component
 const GoogleIcon = () => (
@@ -44,7 +45,8 @@ function LoginPage() {
 
       if (success) {
         setAlertModal({ open: true, title: 'Success', message: 'Login Successful!', type: 'success' });
-        setTimeout(() => navigate('/'), 1000);
+        const destination = isAdmin(localStorage.getItem('authToken')) ? '/admin/dashboard' : '/';
+        setTimeout(() => navigate(destination), 1000);
       } else {
         setAlertModal({
           open: true,

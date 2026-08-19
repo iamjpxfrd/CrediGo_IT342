@@ -2,14 +2,8 @@
 import * as React from "react"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
-
-const actionTypes = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST"
-}
+const TOAST_DURATION = 7000
+const TOAST_REMOVE_DELAY = 1000
 
 let count = 0
 
@@ -123,6 +117,8 @@ function toast({
       },
     },
   })
+
+  setTimeout(dismiss, TOAST_DURATION)
 
   return {
     id: id,
